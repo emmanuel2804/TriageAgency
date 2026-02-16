@@ -18,7 +18,8 @@ TriageAgency implements a sequential "agency" pattern where:
 - **HTTP Client**: gleam_httpc
 - **JSON**: gleam_json v3
 - **API**: OpenRouter (https://openrouter.ai)
-- **Model**: `openrouter/free` (auto-selects available free models)
+- **Triage Model**: `openrouter/aurora-alpha` (reliable classification)
+- **Agent Model**: `openrouter/free` (auto-selects available free models)
 
 ## Prerequisites
 
@@ -66,9 +67,16 @@ gleam build
 gleam run -- --query "How does binary search work?"
 ```
 
-### With streaming (coming soon):
+### With streaming:
 ```bash
 gleam run -- --query "Write a short story" --stream true
+```
+
+### Without streaming (complete response):
+```bash
+gleam run -- --query "Explain recursion" --stream false
+# Or omit --stream (defaults to false)
+gleam run -- --query "Explain recursion"
 ```
 
 ## Examples
@@ -82,6 +90,37 @@ gleam run -- --query "Explain how async/await works in JavaScript"
 ```bash
 gleam run -- --query "Write a haiku about clouds"
 ```
+
+## Chainlit UI Integration
+
+For a more user-friendly web interface, you can use the included Chainlit integration:
+
+1. **Install Python dependencies**:
+```bash
+pip install -r requirements.txt
+```
+
+2. **Run the Chainlit app**:
+```bash
+chainlit run app.py -w
+```
+
+3. **Open your browser**: The app will automatically open at `http://localhost:8000`
+
+The Chainlit UI provides:
+- 💬 Interactive chat interface
+- 🔄 Progressive streaming responses
+- 🎯 Automatic triage decision display
+- ✨ Better UX for exploring the agent system
+
+**Testing the integration:**
+1. Start the Chainlit server: `chainlit run app.py -w`
+2. Open `http://localhost:8000` in your browser
+3. Try a **technical query**: "Explain how binary search works"
+   - Expected: Triage decision shows "tech", technical explanation appears progressively
+4. Try a **creative query**: "Write a haiku about clouds"
+   - Expected: Triage decision shows "creative", haiku appears progressively
+5. Verify that both queries stream their responses progressively in the UI
 
 ## Architecture
 
@@ -136,18 +175,23 @@ All errors are reported with clear, user-friendly messages.
 - ✅ Error handling and user-friendly messages
 - ✅ Working end-to-end system
 
-### 🚧 Sprint 2 - In Progress
-- ⏳ Streaming response implementation
-- ⏳ HTTP POST streaming to OpenRouter
-- ⏳ Stream chunk parser
+### ✅ Sprint 2 - Completed (3/3 tasks)
+- ✅ Streaming response implementation
+- ✅ HTTP POST streaming to OpenRouter
+- ✅ SSE (Server-Sent Events) chunk parser
+- ✅ Streaming variants of agents (tech_agent_stream, creative_agent_stream)
 
-### 📋 Sprint 3 - Planned
+### 🚧 Sprint 3 - In Progress (4/7 tasks)
+- ✅ Manual testing - API key missing error
+- ✅ Manual testing - Missing --query argument
+- ✅ Manual testing - Technical query (non-streaming)
+- ✅ Manual testing - Creative query (streaming)
 - ⏳ Chainlit UI integration
-- ⏳ Integration testing
-- ⏳ Documentation updates
+- ⏳ Integration testing suite
+- ⏳ Final documentation updates
 
 ### 🎉 Current Status
-**The system is fully operational** for non-streaming queries. You can classify and respond to both technical and creative queries using OpenRouter's free tier.
+**The system is fully operational** for both streaming and non-streaming queries. The triage agent uses `openrouter/aurora-alpha` for reliable classification, with robust parsing that handles various model response formats. You can classify and respond to both technical and creative queries using OpenRouter's free tier.
 
 ## License
 
