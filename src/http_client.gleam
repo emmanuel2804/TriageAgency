@@ -174,6 +174,26 @@ fn parse_delta_content(json_string: String) -> Result(String, AgencyError) {
   }
 }
 
-/// Print a chunk to stdout (simulating streaming)
-@external(erlang, "io", "put_chars")
-fn print_chunk(text: String) -> Nil
+/// Print a chunk to stdout with flush and delay (simulating streaming)
+fn print_chunk(text: String) -> Nil {
+  // Print each character with a small delay to simulate streaming
+  print_chars_with_delay(text)
+}
+
+/// Print characters one by one with delay
+fn print_chars_with_delay(text: String) -> Nil {
+  text
+  |> string.to_graphemes()
+  |> list.each(fn(char) {
+    io_format("~s", [char])
+    sleep_ms(20)  // 20ms delay per character
+  })
+}
+
+/// io:format flushes automatically after each call
+@external(erlang, "io", "format")
+fn io_format(format: String, args: List(String)) -> Nil
+
+/// Sleep for milliseconds
+@external(erlang, "timer", "sleep")
+fn sleep_ms(milliseconds: Int) -> Nil

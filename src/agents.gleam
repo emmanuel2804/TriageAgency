@@ -24,7 +24,7 @@ pub fn tech_agent(query: String, api_key: String) -> Result(String, AgencyError)
 
 /// Tech Agent: Provides technical assistance (streaming)
 /// Makes 1 call to OpenRouter with stream=true
-/// Prints response progressively to stdout
+/// Prints response progressively with delay to simulate streaming
 pub fn tech_agent_stream(query: String, api_key: String) -> Result(Nil, AgencyError) {
   let messages = [
     http_client.Message(role: "system", content: prompts.tech_system_prompt),
@@ -54,7 +54,7 @@ pub fn creative_agent(query: String, api_key: String) -> Result(String, AgencyEr
 
 /// Creative Agent: Assists with creative writing and content creation (streaming)
 /// Makes 1 call to OpenRouter with stream=true
-/// Prints response progressively to stdout
+/// Prints response progressively with delay to simulate streaming
 pub fn creative_agent_stream(query: String, api_key: String) -> Result(Nil, AgencyError) {
   let messages = [
     http_client.Message(role: "system", content: prompts.creative_system_prompt),
