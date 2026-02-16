@@ -32,12 +32,26 @@ TriageAgency implements a sequential "agency" pattern where:
 gleam deps download
 ```
 
-2. **Set your OpenRouter API key**:
+2. **Configure environment variables**:
+
+Create a `.env` file in the project root:
 ```bash
-export OPENROUTER_API_KEY="your-api-key-here"
+# .env
+OPENROUTER_API_KEY=your-api-key-here
 ```
 
 Get your free API key at: https://openrouter.ai
+
+Then, load the environment variables:
+```bash
+# Load variables from .env into your current shell
+source <(cat .env | sed 's/^/export /')
+
+# Or manually export them
+export OPENROUTER_API_KEY="your-api-key-here"
+```
+
+**Note**: Don't commit the `.env` file to git (it's already in `.gitignore`).
 
 3. **Build the project**:
 ```bash
