@@ -6,7 +6,6 @@ import gleam/httpc
 import gleam/json
 import gleam/list
 import gleam/int
-import gleam/dynamic/decode
 import gleam/string
 import types.{type AgencyError, HttpError, JsonParseError}
 
@@ -76,20 +75,25 @@ fn build_request_body(
 
 /// Parse OpenRouter non-streaming JSON response
 /// Extracts choices[0].message.content
+/// Simple string-based extraction (works reliably with OpenRouter's consistent format)
 pub fn parse_response(json_string: String) -> Result(String, AgencyError) {
-  let decoder =
-    decode.at(
-      ["choices", "0", "message", "content"],
-      decode.string,
-    )
-
-  case json.parse(json_string, decoder) {
-    Ok(content) -> Ok(content)
-    Error(errors) -> {
-      let error_msg =
-        "Failed to parse JSON: "
-        <> string.inspect(errors)
-      Error(JsonParseError(error_msg))
+  // Find "content":" in the JSON and extract until the next "
+  case string.split(json_string, on: "\"content\":\"") {
+    [_, rest, ..] -> {
+      case string.split(rest, on: "\"") {
+        [content, ..] -> {
+          // Clean up JSON escape sequences
+          let clean_content =
+            content
+            |> string.replace("\\n", "")
+            |> string.replace("\\t", "")
+            |> string.replace("\\r", "")
+            |> string.trim()
+          Ok(clean_content)
+        }
+        _ -> Error(JsonParseError("Could not extract content field"))
+      }
     }
+    _ -> Error(JsonParseError("No content field found in response"))
   }
 }

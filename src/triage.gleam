@@ -5,8 +5,8 @@ import http_client
 import prompts
 import types.{type AgencyError, type Intent}
 
-/// Model to use for triage (free model from OpenRouter)
-const triage_model = "meta-llama/llama-3.1-8b-instruct:free"
+/// Model to use for triage (free router from OpenRouter)
+const triage_model = "openrouter/free"
 
 /// Triage function: Classifies a user query as Tech or Creative
 /// Makes exactly 1 call to OpenRouter with stream=false

@@ -4,8 +4,8 @@ import http_client
 import prompts
 import types.{type AgencyError}
 
-/// Model to use for final agents (free model from OpenRouter)
-const agent_model = "meta-llama/llama-3.1-8b-instruct:free"
+/// Model to use for final agents (free router from OpenRouter)
+const agent_model = "openrouter/free"
 
 /// Tech Agent: Provides technical assistance
 /// Makes 1 call to OpenRouter with stream=false
