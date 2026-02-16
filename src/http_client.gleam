@@ -97,3 +97,83 @@ pub fn parse_response(json_string: String) -> Result(String, AgencyError) {
     _ -> Error(JsonParseError("No content field found in response"))
   }
 }
+
+/// Process streaming response from OpenRouter
+/// Parses SSE format (data: {...}) and extracts delta content
+pub fn process_streaming_response(response_body: String) -> Result(Nil, AgencyError) {
+  // Split response into lines
+  let lines = string.split(response_body, on: "\n")
+
+  // Process each line
+  list.each(lines, fn(line) {
+    case parse_stream_chunk(line) {
+      Ok(content) if content != "" -> {
+        // Print chunk immediately (simulating streaming)
+        print_chunk(content)
+      }
+      Ok(_) -> Nil  // Empty chunk or [DONE]
+      Error(_) -> Nil  // Skip malformed chunks
+    }
+  })
+
+  Ok(Nil)
+}
+
+/// Parse a single SSE chunk line
+/// Returns content string if valid, empty string if empty/done, Error if malformed
+fn parse_stream_chunk(line: String) -> Result(String, AgencyError) {
+  let trimmed = string.trim(line)
+
+  // Skip empty lines
+  case trimmed {
+    "" -> Ok("")
+    _ -> {
+      // Check for "data: " prefix
+      case string.starts_with(trimmed, "data: ") {
+        True -> {
+          let data = string.drop_start(trimmed, 6)
+
+          // Check for [DONE] marker
+          case data {
+            "[DONE]" -> Ok("")
+            _ -> parse_delta_content(data)
+          }
+        }
+        False -> Ok("")  // Skip lines without "data: " prefix
+      }
+    }
+  }
+}
+
+/// Parse delta content from streaming chunk
+/// Extracts choices[0].delta.content
+fn parse_delta_content(json_string: String) -> Result(String, AgencyError) {
+  // Look for "content":" in delta
+  case string.contains(json_string, "\"content\":\"") {
+    True -> {
+      case string.split(json_string, on: "\"content\":\"") {
+        [_, rest, ..] -> {
+          case string.split(rest, on: "\"") {
+            [content, ..] -> {
+              // Clean up JSON escape sequences
+              let clean_content =
+                content
+                |> string.replace("\\n", "\n")
+                |> string.replace("\\t", "\t")
+                |> string.replace("\\r", "\r")
+
+              Ok(clean_content)
+            }
+            _ -> Ok("")
+          }
+        }
+        _ -> Ok("")
+      }
+    }
+    False -> Ok("")  // No content in this chunk
+  }
+}
+
+/// Print a chunk to stdout (simulating streaming)
+@external(erlang, "io", "put_chars")
+fn print_chunk(text: String) -> Nil

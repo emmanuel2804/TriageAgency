@@ -26,23 +26,31 @@ pub fn agency(
       // Step 3: Call the appropriate agent
       case intent {
         Tech -> {
-          case agents.tech_agent(query, api_key) {
-            Ok(response) -> {
-              // Step 4: Print the response (no-stream for now)
-              io.println(response)
-              Ok(Nil)
+          case stream {
+            True -> agents.tech_agent_stream(query, api_key)
+            False -> {
+              case agents.tech_agent(query, api_key) {
+                Ok(response) -> {
+                  io.println(response)
+                  Ok(Nil)
+                }
+                Error(e) -> Error(e)
+              }
             }
-            Error(e) -> Error(e)
           }
         }
         Creative -> {
-          case agents.creative_agent(query, api_key) {
-            Ok(response) -> {
-              // Step 4: Print the response (no-stream for now)
-              io.println(response)
-              Ok(Nil)
+          case stream {
+            True -> agents.creative_agent_stream(query, api_key)
+            False -> {
+              case agents.creative_agent(query, api_key) {
+                Ok(response) -> {
+                  io.println(response)
+                  Ok(Nil)
+                }
+                Error(e) -> Error(e)
+              }
             }
-            Error(e) -> Error(e)
           }
         }
       }
