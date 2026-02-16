@@ -61,10 +61,11 @@ async def main(message: cl.Message):
 
         # Check if API key is available
         if "OPENROUTER_API_KEY" not in env:
-            await msg.update(
-                content="❌ **Error**: OPENROUTER_API_KEY not found in environment.\n\n"
+            msg.content = (
+                "❌ **Error**: OPENROUTER_API_KEY not found in environment.\n\n"
                 "Please set it in the `.env` file."
             )
+            await msg.update()
             return
 
         # Spawn the Gleam CLI as a subprocess with streaming enabled
@@ -90,37 +91,43 @@ async def main(message: cl.Message):
         accumulated_output = ""
         triage_decision = None
 
-        for line in iter(process.stdout.readline, ""):
-            if not line:
-                break
+        if process.stdout:
+            for line in iter(process.stdout.readline, ""):
+                if not line:
+                    break
 
-            accumulated_output += line
+                accumulated_output += line
 
-            # Check if this is the triage decision line
-            if "🤖 Triage decision:" in line:
-                triage_decision = line.strip()
-                await msg.update(content=triage_decision + "\n\n")
-            else:
-                # Update the message with accumulated streaming content
-                if triage_decision:
-                    await msg.update(content=triage_decision + "\n\n" + accumulated_output)
+                # Check if this is the triage decision line
+                if "🤖 Triage decision:" in line:
+                    triage_decision = line.strip()
+                    msg.content = triage_decision + "\n\n"
+                    await msg.update()
                 else:
-                    await msg.update(content=accumulated_output)
+                    # Update the message with accumulated streaming content
+                    if triage_decision:
+                        msg.content = triage_decision + "\n\n" + accumulated_output
+                    else:
+                        msg.content = accumulated_output
+                    await msg.update()
 
         # Wait for the process to complete
         return_code = process.wait()
 
         if return_code != 0:
             error_msg = f"\n\n❌ **Error**: CLI exited with code {return_code}"
-            await msg.update(content=accumulated_output + error_msg)
+            msg.content = accumulated_output + error_msg
+            await msg.update()
 
     except FileNotFoundError:
-        await msg.update(
-            content=f"❌ **Error**: Gleam binary not found at `{GLEAM_BIN}`.\n\n"
+        msg.content = (
+            f"❌ **Error**: Gleam binary not found at `{GLEAM_BIN}`.\n\n"
             "Please ensure Gleam is installed and the path is correct."
         )
+        await msg.update()
     except Exception as e:
-        await msg.update(content=f"❌ **Error**: {str(e)}")
+        msg.content = f"❌ **Error**: {str(e)}"
+        await msg.update()
 
 
 if __name__ == "__main__":
