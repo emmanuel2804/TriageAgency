@@ -16,14 +16,13 @@ pub fn agency(
   stream: Bool,
   api_key: String,
 ) -> Result(Nil, AgencyError) {
-  // Step 1: Triage the query
+
   case triage.triage(query, api_key) {
     Ok(intent) -> {
-      // Step 2: Print the decision
-      io.println("🤖 Triage decision: " <> types.intent_to_string(intent))
+
+      io.println("Triage decision: " <> types.intent_to_string(intent))
       io.println("")
 
-      // Step 3: Call the appropriate agent
       case intent {
         Tech -> {
           case stream {

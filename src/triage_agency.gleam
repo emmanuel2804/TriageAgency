@@ -16,20 +16,20 @@ pub fn main() {
           case agency.agency(query, stream, api_key) {
             Ok(_) -> halt(0)
             Error(error) -> {
-              io.println_error("❌ Error: " <> types.error_to_string(error))
+              io.println_error("Error: " <> types.error_to_string(error))
               halt(1)
             }
           }
         }
         Error(msg) -> {
-          io.println_error("❌ " <> msg)
+          io.println_error("Error: " <> msg)
           print_usage()
           halt(1)
         }
       }
     }
     Error(error) -> {
-      io.println_error("❌ " <> types.error_to_string(error))
+      io.println_error("Error: " <> types.error_to_string(error))
       halt(1)
     }
   }
