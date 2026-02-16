@@ -1,5 +1,6 @@
 import gleam/io
 import gleam/list
+import gleam/string
 import agency
 import config
 import types
@@ -94,9 +95,32 @@ fn print_usage() {
   io.println("")
 }
 
-/// Get command line arguments
+/// Get command line arguments (returns charlists from Erlang)
 @external(erlang, "init", "get_plain_arguments")
-fn get_args() -> List(String)
+fn get_args_raw() -> List(List(Int))
+
+/// Convert charlists to Gleam strings
+fn get_args() -> List(String) {
+  get_args_raw()
+  |> list.map(charlist_to_string)
+}
+
+/// Convert Erlang charlist to Gleam string
+fn charlist_to_string(charlist: List(Int)) -> String {
+  charlist
+  |> list.map(fn(code) {
+    case code >= 0 && code <= 1_114_111 {
+      True -> string.utf_codepoint(code)
+      False -> panic as "Invalid codepoint"
+    }
+  })
+  |> list.fold("", fn(acc, codepoint) {
+    case codepoint {
+      Ok(cp) -> acc <> string.from_utf_codepoints([cp])
+      Error(_) -> acc
+    }
+  })
+}
 
 /// Exit with code
 @external(erlang, "erlang", "halt")
