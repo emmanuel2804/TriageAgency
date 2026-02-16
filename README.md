@@ -13,17 +13,18 @@ TriageAgency implements a sequential "agency" pattern where:
 
 ## Stack
 
-- **Language**: Gleam
+- **Language**: Gleam 1.14.0+
+- **Runtime**: Erlang/OTP 27+
 - **HTTP Client**: gleam_httpc
-- **JSON**: gleam_json
+- **JSON**: gleam_json v3
 - **API**: OpenRouter (https://openrouter.ai)
-- **Model**: `meta-llama/llama-3.1-8b-instruct:free`
+- **Model**: `openrouter/free` (auto-selects available free models)
 
 ## Prerequisites
 
-- Erlang/OTP
-- Gleam 1.14.0+
-- OpenRouter API key
+- **Erlang/OTP 27+** (required for gleam_json v3)
+- **Gleam 1.14.0+**
+- **OpenRouter API key** (free tier available)
 
 ## Setup
 
@@ -36,11 +37,11 @@ gleam deps download
 
 Create a `.env` file in the project root:
 ```bash
-# .env
-OPENROUTER_API_KEY=your-api-key-here
+cp .env.example .env
+# Edit .env and add your OpenRouter API key
 ```
 
-Get your free API key at: https://openrouter.ai
+Get your free API key at: https://openrouter.ai/keys
 
 Then, load the environment variables:
 ```bash
@@ -119,21 +120,34 @@ All errors are reported with clear, user-friendly messages.
 
 ## Development Status
 
-✅ **Completed:**
-- Project setup and dependencies
-- Type system and error handling
-- Environment variable configuration
-- System prompts design
-- HTTP client (non-streaming)
-- JSON response parser
-- Triage agent implementation
-- Tech and Creative agents
-- CLI argument parsing
-- Agency orchestration
+### ✅ Sprint 1 - Completed (14/14 tasks)
+- ✅ Project initialization with Gleam
+- ✅ Dependencies setup (httpc, json, http, envoy)
+- ✅ Shared types module (Intent, AgencyError)
+- ✅ Environment configuration (API key reading)
+- ✅ System prompts for all agents
+- ✅ HTTP client for OpenRouter API
+- ✅ JSON response parser (string-based, robust)
+- ✅ Triage agent (query classification)
+- ✅ Tech and Creative final agents
+- ✅ Agency orchestration function
+- ✅ CLI argument parsing (--query, --stream)
+- ✅ Main function integration
+- ✅ Error handling and user-friendly messages
+- ✅ Working end-to-end system
 
-🚧 **In Progress:**
-- Streaming responses
-- Chainlit UI integration
+### 🚧 Sprint 2 - In Progress
+- ⏳ Streaming response implementation
+- ⏳ HTTP POST streaming to OpenRouter
+- ⏳ Stream chunk parser
+
+### 📋 Sprint 3 - Planned
+- ⏳ Chainlit UI integration
+- ⏳ Integration testing
+- ⏳ Documentation updates
+
+### 🎉 Current Status
+**The system is fully operational** for non-streaming queries. You can classify and respond to both technical and creative queries using OpenRouter's free tier.
 
 ## License
 
